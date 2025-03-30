@@ -37,4 +37,42 @@ describe Reservation do
       expect(reservation.cancelled?).to eq(true)
     end
   end
+  
+  context 'when creating a reservation' do
+    it 'generates a hash_id in the correct format' do
+      reservation_date = DateTime.new(2025, 4, 15, 18, 30)
+      restaurant = create(:restaurant)
+      guest = create(:guest, restaurant: restaurant)
+      reservation = create(:reservation, guest: guest, restaurant: restaurant, start_time: reservation_date)
+      
+      expect(reservation.hash_id).to be_present
+      expect(reservation.hash_id).to match(/^\d{6}_[A-Za-z]{5}$/)
+      
+      date_part = reservation_date.strftime("%d%m%y")
+      expect(reservation.hash_id).to start_with(date_part)
+    end
+    
+    context 'with Facebook API integration' do
+      let(:restaurant) { create(:restaurant, :with_channel_credentials) }
+      let(:guest) { create(:guest, restaurant: restaurant) }
+      
+      before do
+        # Stub the FacebookQrService
+        allow_any_instance_of(FacebookQrService).to receive(:generate_qr_code).and_return({
+          'code' => 'IJ5TLDV2DPTHL1',
+          'prefilled_message' => '120325_A1234',
+          'deep_link_url' => 'https://wa.me/message/IJ5TLDV2DPTHL1',
+          'qr_image_url' => 'https://example.com/qr_image.svg'
+        })
+        
+        allow_any_instance_of(FacebookQrService).to receive(:upload_qr_to_s3).and_return('https://s3-bucket.example.com/qr_image.svg')
+      end
+      
+      it 'generates a QR code and uploads to S3' do
+        reservation = create(:reservation, guest: guest, restaurant: restaurant)
+        
+        expect(reservation.qr_code_image).to eq('https://s3-bucket.example.com/qr_image.svg')
+      end
+    end
+  end
 end

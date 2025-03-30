@@ -35,7 +35,9 @@ module V1
     end
 
     def restaurant_params
-      params.require(:restaurant).permit(:name, :cuisines, :phone, :email, :location,
+      params.require(:restaurant).permit(:name, :cuisines, :phone, :email, :location, 
+                                         :channel_phone_id, :channel_token, :channel_number, 
+                                         :tenant_id, :reservations_contacts, :metadata,
                                          opening_times_attributes: %i[day_of_week opening_time closing_time])
     end
 

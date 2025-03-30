@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2019_12_17_113331) do
+ActiveRecord::Schema.define(version: 2025_04_01_000001) do
 
   create_table "guests", force: :cascade do |t|
     t.string "first_name"
@@ -20,6 +20,9 @@ ActiveRecord::Schema.define(version: 2019_12_17_113331) do
     t.integer "restaurant_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "notes"
+    t.text "allergies"
+    t.json "metadata"
   end
 
   create_table "opening_times", force: :cascade do |t|
@@ -40,6 +43,11 @@ ActiveRecord::Schema.define(version: 2019_12_17_113331) do
     t.integer "guest_id"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "qr_code_image"
+    t.text "hash_id"
+    t.string "table"
+    t.json "metadata"
+    t.index ["hash_id"], name: "index_reservations_on_hash_id", unique: true
   end
 
   create_table "restaurants", force: :cascade do |t|
@@ -50,6 +58,12 @@ ActiveRecord::Schema.define(version: 2019_12_17_113331) do
     t.string "location"
     t.datetime "created_at", precision: 6, null: false
     t.datetime "updated_at", precision: 6, null: false
+    t.text "channel_phone_id"
+    t.text "channel_token"
+    t.text "channel_number"
+    t.text "tenant_id"
+    t.json "reservations_contacts"
+    t.json "metadata"
   end
 
   create_table "users", force: :cascade do |t|

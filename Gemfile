@@ -3,12 +3,12 @@
 source 'https://rubygems.org'
 git_source(:github) { |repo| "https://github.com/#{repo}.git" }
 
-ruby '2.6.5'
+ruby '2.7.8'
 
 # Bundle edge Rails instead: gem 'rails', github: 'rails/rails'
 gem 'rails', '~> 6.0.2'
 # Use sqlite3 as the database for Active Record
-gem 'sqlite3'
+gem 'sqlite3', '~> 1.6.0'
 # Use Puma as the app server
 gem 'puma', '~> 3.12'
 # Code style
@@ -18,6 +18,10 @@ gem 'devise'
 gem 'simple_token_authentication', '~> 1.0'
 # Used for authotization
 gem 'cancancan'
+# AWS SDK for S3 file uploads
+gem 'aws-sdk-s3', '~> 1.140'
+# HTTP requests
+gem 'httparty', '~> 0.21.0'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
@@ -46,6 +50,7 @@ group :development, :test do
   gem 'rspec'
   gem 'rspec-core'
   gem 'rspec-rails'
+  gem 'dotenv-rails'
 end
 
 group :development do

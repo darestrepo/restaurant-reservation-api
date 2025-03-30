@@ -28,3 +28,6 @@
 
 # Ignore RubyMine files
 .idea/
+
+# Ignore environment variables
+.env

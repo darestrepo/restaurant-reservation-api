@@ -9,8 +9,10 @@ Rails.application.routes.draw do
 
   namespace :v1 do
     resources :restaurants do
+      get 'reservations/by_hash/:hash_id', to: 'reservations#show_by_hash_at_restaurant', as: 'reservation_by_hash'
       resources :guests do
         resources :reservations
+        get 'reservations/by_hash/:hash_id', to: 'reservations#show_by_hash', as: 'reservation_by_hash'
       end
     end
   end

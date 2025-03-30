@@ -48,4 +48,38 @@ describe V1::ReservationsController do
     delete :destroy, params: { restaurant_id: restaurant.id, guest_id: guest.id, id: reservation.id }
     expect(Reservation.count).to eq(0)
   end
+
+  it 'returns reservation details by hash_id' do
+    restaurant = create(:restaurant, :with_guest_and_reservation)
+    guest = restaurant.guests.first
+    reservation = restaurant.reservations.first
+    
+    # Ensure the reservation has a hash_id
+    hash_id = "010425_AbCdE"
+    reservation.update(hash_id: hash_id)
+    
+    get :show_by_hash, params: { restaurant_id: restaurant.id, guest_id: guest.id, hash_id: hash_id }
+    
+    expect(response).to have_http_status(:success)
+    expect(json['reservation']['id']).to eq(reservation.id)
+    expect(json['guest']['id']).to eq(guest.id)
+    expect(json['recent_reservations_count']).to be_a(Integer)
+  end
+  
+  it 'returns reservation details by hash_id at restaurant level' do
+    restaurant = create(:restaurant, :with_guest_and_reservation)
+    guest = restaurant.guests.first
+    reservation = restaurant.reservations.first
+    
+    # Ensure the reservation has a hash_id
+    hash_id = "010425_XyZaB"
+    reservation.update(hash_id: hash_id)
+    
+    get :show_by_hash_at_restaurant, params: { restaurant_id: restaurant.id, hash_id: hash_id }
+    
+    expect(response).to have_http_status(:success)
+    expect(json['reservation']['id']).to eq(reservation.id)
+    expect(json['guest']['id']).to eq(guest.id)
+    expect(json['recent_reservations_count']).to be_a(Integer)
+  end
 end

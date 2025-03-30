@@ -1,0 +1,746 @@
+{
+	"info": {
+		"_postman_id": "b7563b44-6a45-4d1b-9902-8aa9fa7b1d3d",
+		"name": "Restaurant Reservation API",
+		"description": "API for managing restaurant reservations, guests, and restaurant information.",
+		"schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json"
+	},
+	"item": [
+		{
+			"name": "Authentication",
+			"item": [
+				{
+					"name": "Sign In",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"email\": \"user@example.com\",\n    \"password\": \"password123\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/sign_in",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"sign_in"
+							]
+						},
+						"description": "Sign in to the application and get authentication token. Save the email and authentication token from the response headers (X-User-Email and X-User-Token)."
+					},
+					"response": []
+				},
+				{
+					"name": "Sign Out",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/users/sign_out",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"sign_out"
+							]
+						},
+						"description": "Sign out from the application"
+					},
+					"response": []
+				},
+				{
+					"name": "Register New User",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"email\": \"newuser@example.com\",\n    \"password\": \"password123\",\n    \"password_confirmation\": \"password123\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users"
+							]
+						},
+						"description": "Register a new user account"
+					},
+					"response": []
+				},
+				{
+					"name": "Reset Password Request",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"user\": {\n    \"email\": \"user@example.com\"\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/users/password",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"users",
+								"password"
+							]
+						},
+						"description": "Request a password reset email"
+					},
+					"response": []
+				}
+			],
+			"description": "Authentication endpoints for user management"
+		},
+		{
+			"name": "Restaurants",
+			"item": [
+				{
+					"name": "List All Restaurants",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants"
+							]
+						},
+						"description": "Get a list of all restaurants"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Restaurant",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"restaurant\": {\n    \"name\": \"Kanaryo Restaurant\",\n    \"cuisines\": \"Colombian\",\n    \"phone\": \"123-456-7890\",\n    \"email\": \"contact@kanaryo.com\",\n    \"location\": \"Medellín, Colombia\",\n    \"channel_phone_id\": \"phone_id_123\",\n    \"channel_token\": \"token_abc123\",\n    \"channel_number\": \"+573001234567\",\n    \"tenant_id\": \"tenant_xyz789\",\n    \"reservations_contacts\": {\"primary\": \"John Doe\", \"secondary\": \"Jane Smith\"},\n    \"metadata\": {\"featured\": true, \"rating\": 4.8},\n    \"opening_times_attributes\": [\n      {\n        \"day_of_week\": \"monday\",\n        \"opening_time\": \"11:00\",\n        \"closing_time\": \"22:00\"\n      },\n      {\n        \"day_of_week\": \"tuesday\",\n        \"opening_time\": \"11:00\",\n        \"closing_time\": \"22:00\"\n      },\n      {\n        \"day_of_week\": \"wednesday\",\n        \"opening_time\": \"11:00\",\n        \"closing_time\": \"22:00\"\n      },\n      {\n        \"day_of_week\": \"thursday\",\n        \"opening_time\": \"11:00\",\n        \"closing_time\": \"22:00\"\n      },\n      {\n        \"day_of_week\": \"friday\",\n        \"opening_time\": \"11:00\",\n        \"closing_time\": \"23:00\"\n      },\n      {\n        \"day_of_week\": \"saturday\",\n        \"opening_time\": \"11:00\",\n        \"closing_time\": \"23:00\"\n      },\n      {\n        \"day_of_week\": \"sunday\",\n        \"opening_time\": \"12:00\",\n        \"closing_time\": \"21:00\"\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants"
+							]
+						},
+						"description": "Create a new restaurant with opening times"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Restaurant Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}"
+							]
+						},
+						"description": "Get details for a specific restaurant"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Restaurant",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"restaurant\": {\n    \"name\": \"Updated Restaurant Name\",\n    \"cuisines\": \"Colombian, Latin American\",\n    \"phone\": \"123-456-7890\",\n    \"email\": \"updated@kanaryo.com\",\n    \"location\": \"Medellín, Colombia\",\n    \"channel_phone_id\": \"updated_phone_id_456\",\n    \"channel_token\": \"updated_token_def456\",\n    \"channel_number\": \"+573009876543\",\n    \"tenant_id\": \"updated_tenant_abc123\",\n    \"reservations_contacts\": {\"primary\": \"Updated Manager\", \"secondary\": \"Updated Assistant\"},\n    \"metadata\": {\"featured\": true, \"rating\": 4.9, \"updated\": true},\n    \"opening_times_attributes\": [\n      {\n        \"day_of_week\": \"monday\",\n        \"opening_time\": \"10:00\",\n        \"closing_time\": \"22:00\"\n      }\n    ]\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}"
+							]
+						},
+						"description": "Update restaurant information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Restaurant",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}"
+							]
+						},
+						"description": "Delete a restaurant"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for managing restaurant information"
+		},
+		{
+			"name": "Guests",
+			"item": [
+				{
+					"name": "List Restaurant Guests",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests"
+							]
+						},
+						"description": "Get all guests for a restaurant"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Guest",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"guest\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe\",\n    \"email\": \"john@example.com\",\n    \"phone\": \"123-456-7890\",\n    \"notes\": \"VIP guest, prefers window seating\",\n    \"allergies\": \"Peanuts, shellfish\",\n    \"metadata\": {\"visits\": 5, \"avg_spend\": 120, \"preferences\": \"Red wine\"}\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests"
+							]
+						},
+						"description": "Create a new guest for a restaurant"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Guest Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests/{{guest_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests",
+								"{{guest_id}}"
+							]
+						},
+						"description": "Get details for a specific guest"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Guest",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"guest\": {\n    \"first_name\": \"John\",\n    \"last_name\": \"Doe Updated\",\n    \"email\": \"john.updated@example.com\",\n    \"phone\": \"987-654-3210\",\n    \"notes\": \"VIP guest, now prefers quiet corner table\",\n    \"allergies\": \"Peanuts, dairy\",\n    \"metadata\": {\"visits\": 8, \"avg_spend\": 150, \"preferences\": \"White wine\"}\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests/{{guest_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests",
+								"{{guest_id}}"
+							]
+						},
+						"description": "Update guest information"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Guest",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests/{{guest_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests",
+								"{{guest_id}}"
+							]
+						},
+						"description": "Delete a guest from the restaurant"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for managing restaurant guests"
+		},
+		{
+			"name": "Reservations",
+			"item": [
+				{
+					"name": "List Guest Reservations",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests/{{guest_id}}/reservations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests",
+								"{{guest_id}}",
+								"reservations"
+							]
+						},
+						"description": "Get all reservations for a specific guest at a restaurant"
+					},
+					"response": []
+				},
+				{
+					"name": "Create Reservation",
+					"request": {
+						"method": "POST",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reservation\": {\n    \"status\": 2,\n    \"start_time\": \"2023-08-15T19:00:00\",\n    \"covers\": 4,\n    \"notes\": \"Corner table if possible\",\n    \"table\": \"T15\",\n    \"qr_code_image\": \"base64_encoded_qr_code_image_data\",\n    \"hash_id\": \"res_abc123xyz789\",\n    \"metadata\": {\"source\": \"website\", \"special_occasion\": \"anniversary\"}\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests/{{guest_id}}/reservations",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests",
+								"{{guest_id}}",
+								"reservations"
+							]
+						},
+						"description": "Create a new reservation for a guest. Status values: 0=requested, 1=pending, 2=booked, 3=ended, 4=cancelled"
+					},
+					"response": []
+				},
+				{
+					"name": "Get Reservation Details",
+					"request": {
+						"method": "GET",
+						"header": [
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests/{{guest_id}}/reservations/{{reservation_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests",
+								"{{guest_id}}",
+								"reservations",
+								"{{reservation_id}}"
+							]
+						},
+						"description": "Get details for a specific reservation"
+					},
+					"response": []
+				},
+				{
+					"name": "Update Reservation",
+					"request": {
+						"method": "PUT",
+						"header": [
+							{
+								"key": "Content-Type",
+								"value": "application/json"
+							},
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"body": {
+							"mode": "raw",
+							"raw": "{\n  \"reservation\": {\n    \"status\": 3,\n    \"start_time\": \"2023-08-16T20:00:00\",\n    \"covers\": 5,\n    \"notes\": \"Window table, celebrating birthday\",\n    \"table\": \"T20\",\n    \"qr_code_image\": \"updated_base64_encoded_qr_code_image_data\",\n    \"hash_id\": \"res_updated_def456abc789\",\n    \"metadata\": {\"source\": \"phone\", \"special_occasion\": \"birthday\", \"cake_ordered\": true}\n  }\n}"
+						},
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests/{{guest_id}}/reservations/{{reservation_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests",
+								"{{guest_id}}",
+								"reservations",
+								"{{reservation_id}}"
+							]
+						},
+						"description": "Update reservation information. Status values: 0=requested, 1=pending, 2=booked, 3=ended, 4=cancelled"
+					},
+					"response": []
+				},
+				{
+					"name": "Delete Reservation",
+					"request": {
+						"method": "DELETE",
+						"header": [
+							{
+								"key": "X-User-Email",
+								"value": "{{user_email}}",
+								"type": "text"
+							},
+							{
+								"key": "X-User-Token",
+								"value": "{{user_token}}",
+								"type": "text"
+							}
+						],
+						"url": {
+							"raw": "{{base_url}}/v1/restaurants/{{restaurant_id}}/guests/{{guest_id}}/reservations/{{reservation_id}}",
+							"host": [
+								"{{base_url}}"
+							],
+							"path": [
+								"v1",
+								"restaurants",
+								"{{restaurant_id}}",
+								"guests",
+								"{{guest_id}}",
+								"reservations",
+								"{{reservation_id}}"
+							]
+						},
+						"description": "Cancel/delete a reservation"
+					},
+					"response": []
+				}
+			],
+			"description": "Endpoints for managing guest reservations"
+		}
+	],
+	"event": [
+		{
+			"listen": "prerequest",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		},
+		{
+			"listen": "test",
+			"script": {
+				"type": "text/javascript",
+				"exec": [
+					""
+				]
+			}
+		}
+	],
+	"variable": [
+		{
+			"key": "base_url",
+			"value": "http://localhost:3000",
+			"type": "string",
+			"description": "Base URL for the API"
+		},
+		{
+			"key": "user_email",
+			"value": "",
+			"type": "string",
+			"description": "The email of the authenticated user"
+		},
+		{
+			"key": "user_token",
+			"value": "",
+			"type": "string",
+			"description": "Authentication token received after signing in"
+		},
+		{
+			"key": "restaurant_id",
+			"value": "",
+			"type": "string",
+			"description": "ID of the restaurant you're working with"
+		},
+		{
+			"key": "guest_id",
+			"value": "",
+			"type": "string",
+			"description": "ID of the guest you're working with"
+		},
+		{
+			"key": "reservation_id",
+			"value": "",
+			"type": "string",
+			"description": "ID of the reservation you're working with"
+		}
+	]
+} 

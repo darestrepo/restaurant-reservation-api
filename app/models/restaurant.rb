@@ -12,7 +12,7 @@ class Restaurant < ApplicationRecord
   serialize :cuisines
 
   CUISINES = %i[american chinese thai italian mexican indian japanese mediterranean turkish greek vegetarian
-                vietnamese french spanish].freeze # There are others!
+                vietnamese french spanish columbian].freeze # There are others!
 
   def opening_times_attributes=(attrs)
     opening_times = attrs.map do |ot|
