@@ -8,7 +8,13 @@ module V1
     authorize_resource
 
     def index
-      json_response(Restaurant.all.map(&method(:restaurant_json_format)))
+      if current_user.admin?
+        restaurants = Restaurant.all
+      else
+        # For non-admin users, only show their assigned restaurant
+        restaurants = Restaurant.where(id: current_user.restaurant_id)
+      end
+      json_response(restaurants.map(&method(:restaurant_json_format)))
     end
 
     def show
@@ -21,6 +27,7 @@ module V1
     end
 
     def create
+      # Only admins can create restaurants
       json_response(restaurant_json_format(Restaurant.create!(restaurant_params)))
     end
 
@@ -38,6 +45,8 @@ module V1
       params.require(:restaurant).permit(:name, :cuisines, :phone, :email, :location, 
                                          :channel_phone_id, :channel_token, :channel_number, 
                                          :tenant_id, :reservations_contacts, :metadata,
+                                         :send_confirmation, :send_confirmation_before,
+                                         :confirmation_header_text, :confirmation_body_text,
                                          opening_times_attributes: %i[day_of_week opening_time closing_time])
     end
 

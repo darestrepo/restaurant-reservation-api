@@ -7,12 +7,15 @@
 
 # Read more: https://github.com/cyu/rack-cors
 
-# Rails.application.config.middleware.insert_before 0, Rack::Cors do
-#   allow do
-#     origins 'example.com'
-#
-#     resource '*',
-#       headers: :any,
-#       methods: [:get, :post, :put, :patch, :delete, :options, :head]
-#   end
-# end
+Rails.application.config.middleware.insert_before 0, Rack::Cors do
+  allow do
+    # Allow localhost and the user's specific domain
+    origins 'http://localhost:8080', 'https://alejo.kanaryo.com', 'http://alejo.kanaryo.com', 'localhost:8080', 'http://localhost:8080' 
+
+    resource '*',
+      headers: :any,
+      methods: [:get, :post, :put, :patch, :delete, :options, :head],
+      expose: ['Authorization', 'X-User-Token', 'X-User-Email'], # Ensure your auth headers are exposed
+      credentials: true
+  end
+end

@@ -10,7 +10,7 @@
 #
 # It's strongly recommended that you check this file into your version control system.
 
-ActiveRecord::Schema.define(version: 2025_04_01_000001) do
+ActiveRecord::Schema.define(version: 2025_04_02_221000) do
 
   create_table "guests", force: :cascade do |t|
     t.string "first_name"
@@ -23,6 +23,7 @@ ActiveRecord::Schema.define(version: 2025_04_01_000001) do
     t.text "notes"
     t.text "allergies"
     t.json "metadata"
+    t.string "full_name"
   end
 
   create_table "opening_times", force: :cascade do |t|
@@ -47,6 +48,8 @@ ActiveRecord::Schema.define(version: 2025_04_01_000001) do
     t.text "hash_id"
     t.string "table"
     t.json "metadata"
+    t.boolean "confirmation_request", default: false
+    t.datetime "confirmation_request_date"
     t.index ["hash_id"], name: "index_reservations_on_hash_id", unique: true
   end
 
@@ -64,6 +67,34 @@ ActiveRecord::Schema.define(version: 2025_04_01_000001) do
     t.text "tenant_id"
     t.json "reservations_contacts"
     t.json "metadata"
+    t.boolean "send_confirmation", default: false
+    t.integer "send_confirmation_before", default: 24
+    t.text "confirmation_header_text", default: "Please confirm your reservation"
+    t.text "confirmation_body_text", default: "We're looking forward to seeing you. Please confirm your reservation by replying YES."
+  end
+
+  create_table "sections", force: :cascade do |t|
+    t.integer "restaurant_id", null: false
+    t.string "name"
+    t.text "description"
+    t.integer "capacity"
+    t.json "metadata"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["restaurant_id"], name: "index_sections_on_restaurant_id"
+  end
+
+  create_table "tables", force: :cascade do |t|
+    t.integer "restaurant_id", null: false
+    t.string "name"
+    t.string "section"
+    t.integer "capacity"
+    t.integer "position_x"
+    t.integer "position_y"
+    t.json "metadata"
+    t.datetime "created_at", precision: 6, null: false
+    t.datetime "updated_at", precision: 6, null: false
+    t.index ["restaurant_id"], name: "index_tables_on_restaurant_id"
   end
 
   create_table "users", force: :cascade do |t|
@@ -76,9 +107,17 @@ ActiveRecord::Schema.define(version: 2025_04_01_000001) do
     t.datetime "reset_password_sent_at"
     t.datetime "remember_created_at"
     t.string "authentication_token", limit: 30
+    t.integer "restaurant_id"
+    t.boolean "active", default: true
+    t.string "name"
+    t.string "job"
     t.index ["authentication_token"], name: "index_users_on_authentication_token", unique: true
     t.index ["email"], name: "index_users_on_email", unique: true
     t.index ["reset_password_token"], name: "index_users_on_reset_password_token", unique: true
+    t.index ["restaurant_id"], name: "index_users_on_restaurant_id"
   end
 
+  add_foreign_key "sections", "restaurants"
+  add_foreign_key "tables", "restaurants"
+  add_foreign_key "users", "restaurants"
 end

@@ -44,15 +44,15 @@ class FacebookQrService
       # Download the file from Facebook URL
       image_data = URI.open(qr_url).read
       
-      # Upload to S3
+      # Upload to S3 without ACL (bucket policy makes it public)
       object = S3_BUCKET.object(file_name)
-      object.put(body: image_data)
+      object.put(
+        body: image_data,
+        content_type: 'image/png'
+      )
       
-      # Generate a pre-signed URL that's valid for 7 days (604800 seconds)
-      presigned_url = object.presigned_url(:get, expires_in: 604800)
-      
-      # Return the pre-signed URL
-      presigned_url
+      # Return the public URL 
+      object.public_url
     rescue => e
       Rails.logger.error("S3 upload error: #{e.message}")
       raise "Failed to upload QR to S3: #{e.message}"

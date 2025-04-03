@@ -7,8 +7,19 @@ FactoryBot.define do
     phone { Faker::PhoneNumber.phone_number }
     email { Faker::Internet.email }
     location { Faker::Address.city }
+    send_confirmation { false }
+    send_confirmation_before { 24 }
+    confirmation_header_text { "Please confirm your reservation" }
+    confirmation_body_text { "We're looking forward to seeing you. Please confirm your reservation by replying YES." }
     after :create do |restaurant|
       create(:opening_time, restaurant: restaurant)
+    end
+    
+    trait :with_confirmation_enabled do
+      send_confirmation { true }
+      send_confirmation_before { 48 }
+      confirmation_header_text { "Confirm your reservation at #{name}" }
+      confirmation_body_text { "We're excited to welcome you to #{name}. Please confirm your reservation by replying YES." }
     end
     
     trait :with_channel_credentials do

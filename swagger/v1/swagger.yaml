@@ -1,0 +1,2518 @@
+---
+openapi: 3.0.1
+info:
+  title: Restaurant Reservation API
+  version: v1
+  description: API for managing restaurant reservations, guests, and restaurants
+paths:
+  "/v1/restaurants/{restaurant_id}/guests":
+    parameters:
+    - name: restaurant_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: List all guests for a restaurant
+      tags:
+      - Guests
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: guests found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                    restaurant_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    notes:
+                      type: string
+                      nullable: true
+                    allergies:
+                      type: string
+                      nullable: true
+                    metadata:
+                      type: object
+                      nullable: true
+                    full_name:
+                      type: string
+                      nullable: true
+    post:
+      summary: Create a guest
+      tags:
+      - Guests
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: guest created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  phone:
+                    type: string
+                  email:
+                    type: string
+                  restaurant_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  notes:
+                    type: string
+                    nullable: true
+                  allergies:
+                    type: string
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  full_name:
+                    type: string
+                    nullable: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                guest:
+                  type: object
+                  properties:
+                    first_name:
+                      type: string
+                      example: John
+                      nullable: true
+                    last_name:
+                      type: string
+                      example: Doe
+                      nullable: true
+                    full_name:
+                      type: string
+                      example: John Doe
+                      nullable: true
+                    phone:
+                      type: string
+                      example: 555-123-4567
+                    email:
+                      type: string
+                      example: john.doe@example.com
+                    notes:
+                      type: string
+                      example: VIP guest
+                      nullable: true
+                    allergies:
+                      type: string
+                      example: Nuts, Dairy
+                      nullable: true
+                    metadata:
+                      type: object
+                      example:
+                        preference: Window seat
+                        loyalty_points: 100
+                      nullable: true
+                  required:
+                  - phone
+                  - email
+              required:
+              - guest
+  "/v1/restaurants/{restaurant_id}/guests/search":
+    parameters:
+    - name: restaurant_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Search for guests with or without reservations
+      tags:
+      - Guests
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: matching guests found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    first_name:
+                      type: string
+                    last_name:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                    restaurant_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    notes:
+                      type: string
+                      nullable: true
+                    allergies:
+                      type: string
+                      nullable: true
+                    metadata:
+                      type: object
+                      nullable: true
+                    full_name:
+                      type: string
+                      nullable: true
+                    reservations:
+                      type: array
+                      description: List of reservations matching the filter criteria.
+                        Can be empty if guest has no matching reservations.
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          status:
+                            type: string
+                          start_time:
+                            type: string
+                            format: date-time
+                          covers:
+                            type: integer
+                          notes:
+                            type: string
+                            nullable: true
+                          restaurant_id:
+                            type: integer
+                          guest_id:
+                            type: integer
+                          created_at:
+                            type: string
+                            format: date-time
+                          updated_at:
+                            type: string
+                            format: date-time
+                          qr_code_image:
+                            type: string
+                            nullable: true
+                          hash_id:
+                            type: string
+                            nullable: true
+                          table:
+                            type: string
+                            nullable: true
+                          metadata:
+                            type: object
+                            nullable: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                status:
+                  type: string
+                  example: pending
+                  description: Filter reservations by status. If not specified or
+                    invalid, all statuses will be included.
+                start_time_from:
+                  type: string
+                  format: date-time
+                  example: '2023-05-01T00:00:00.000Z'
+                  description: Start date for reservation search. Defaults to 8 days
+                    ago if not provided.
+                start_time_to:
+                  type: string
+                  format: date-time
+                  example: '2023-05-15T23:59:59.000Z'
+                  description: End date for reservation search. Defaults to 8 days
+                    from now if not provided.
+                email:
+                  type: string
+                  example: john.doe@example.com
+                  description: Filter guests by email. Used if phone is not provided.
+                phone:
+                  type: string
+                  example: '573204917701'
+                  description: Filter guests by phone. Takes precedence over email
+                    if both are provided.
+                guest:
+                  type: object
+                  description: Additional guest filter parameters
+                user_email:
+                  type: string
+                  description: User email for authentication (handled by Devise)
+                user_token:
+                  type: string
+                  description: User token for authentication (handled by Devise)
+  "/v1/restaurants/{restaurant_id}/guests/{id}":
+    parameters:
+    - name: restaurant_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieve a guest
+      tags:
+      - Guests
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: guest found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  phone:
+                    type: string
+                  email:
+                    type: string
+                  restaurant_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  notes:
+                    type: string
+                    nullable: true
+                  allergies:
+                    type: string
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  full_name:
+                    type: string
+                    nullable: true
+    put:
+      summary: Update a guest
+      tags:
+      - Guests
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: guest updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  first_name:
+                    type: string
+                  last_name:
+                    type: string
+                  phone:
+                    type: string
+                  email:
+                    type: string
+                  restaurant_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  notes:
+                    type: string
+                    nullable: true
+                  allergies:
+                    type: string
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  full_name:
+                    type: string
+                    nullable: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                guest:
+                  type: object
+                  properties:
+                    first_name:
+                      type: string
+                      nullable: true
+                    last_name:
+                      type: string
+                      nullable: true
+                    full_name:
+                      type: string
+                      nullable: true
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                    notes:
+                      type: string
+                      nullable: true
+                    allergies:
+                      type: string
+                      nullable: true
+                    metadata:
+                      type: object
+                      nullable: true
+    delete:
+      summary: Delete a guest
+      tags:
+      - Guests
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: guest deleted
+  "/users/password":
+    post:
+      summary: Request password reset
+      tags:
+      - 1-Authentication
+      parameters: []
+      responses:
+        '200':
+          description: reset password instructions sent
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: You will receive an email with instructions on how to
+                      reset your password in a few minutes.
+        '422':
+          description: email not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        items:
+                          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: user@example.com
+                  required:
+                  - email
+              required:
+              - user
+    put:
+      summary: Reset password
+      tags:
+      - 1-Authentication
+      parameters: []
+      responses:
+        '200':
+          description: password updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Your password has been changed successfully.
+        '422':
+          description: invalid token or passwords do not match
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      reset_password_token:
+                        type: array
+                        items:
+                          type: string
+                      password:
+                        type: array
+                        items:
+                          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    reset_password_token:
+                      type: string
+                      example: abcdef123456
+                    password:
+                      type: string
+                      example: new_password
+                    password_confirmation:
+                      type: string
+                      example: new_password
+                  required:
+                  - reset_password_token
+                  - password
+                  - password_confirmation
+              required:
+              - user
+  "/users":
+    post:
+      summary: User registration
+      tags:
+      - 1-Authentication
+      parameters: []
+      responses:
+        '200':
+          description: user registered successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  authentication_token:
+                    type: string
+                  role:
+                    type: integer
+                    description: 0=admin, 1=restaurant, 2=guest
+                  restaurant_id:
+                    type: integer
+                    nullable: true
+                    description: ID of the restaurant this user belongs to
+                  active:
+                    type: boolean
+                  name:
+                    type: string
+                    nullable: true
+                  job:
+                    type: string
+                    nullable: true
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        items:
+                          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: user@example.com
+                    password:
+                      type: string
+                      example: password
+                    password_confirmation:
+                      type: string
+                      example: password
+                    restaurant_id:
+                      type: integer
+                      nullable: true
+                      example: 1
+                    active:
+                      type: boolean
+                      example: true
+                    role:
+                      type: integer
+                      example: 1
+                      description: 0=admin, 1=restaurant, 2=guest
+                    name:
+                      type: string
+                      example: John Doe
+                      nullable: true
+                    job:
+                      type: string
+                      example: Chef
+                      nullable: true
+                  required:
+                  - email
+                  - password
+                  - password_confirmation
+                  - role
+              required:
+              - user
+    put:
+      summary: Update user
+      tags:
+      - 1-Authentication
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: user updated successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  authentication_token:
+                    type: string
+                  role:
+                    type: integer
+                    description: 0=admin, 1=restaurant, 2=guest
+                  restaurant_id:
+                    type: integer
+                    nullable: true
+                    description: ID of the restaurant this user belongs to
+                  active:
+                    type: boolean
+                  name:
+                    type: string
+                    nullable: true
+                  job:
+                    type: string
+                    nullable: true
+        '422':
+          description: invalid request
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  errors:
+                    type: object
+                    properties:
+                      email:
+                        type: array
+                        items:
+                          type: string
+                      current_password:
+                        type: array
+                        items:
+                          type: string
+                      password:
+                        type: array
+                        items:
+                          type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: new_email@example.com
+                    current_password:
+                      type: string
+                      example: current_password
+                    password:
+                      type: string
+                      example: new_password
+                    password_confirmation:
+                      type: string
+                      example: new_password
+                    name:
+                      type: string
+                      example: Updated Name
+                    job:
+                      type: string
+                      example: Updated Position
+              required:
+              - user
+    delete:
+      summary: Delete user
+      tags:
+      - 1-Authentication
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: user deleted successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                    example: Account has been successfully deleted.
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+                    example: You need to sign in or sign up before continuing.
+  "/v1/restaurants/{restaurant_id}/guests/{guest_id}/reservations":
+    parameters:
+    - name: restaurant_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: guest_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: List all reservations for a guest
+      tags:
+      - Reservations
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: reservations found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    status:
+                      type: integer
+                    start_time:
+                      type: string
+                      format: date-time
+                    covers:
+                      type: integer
+                    notes:
+                      type: string
+                      nullable: true
+                    restaurant_id:
+                      type: integer
+                    guest_id:
+                      type: integer
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                    qr_code_image:
+                      type: string
+                      nullable: true
+                    hash_id:
+                      type: string
+                      nullable: true
+                    table:
+                      type: string
+                      nullable: true
+                    metadata:
+                      type: object
+                      nullable: true
+                    confirmation_request:
+                      type: boolean
+                    confirmation_request_date:
+                      type: string
+                      format: date-time
+                      nullable: true
+    post:
+      summary: Create a reservation
+      tags:
+      - Reservations
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: reservation created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  status:
+                    type: integer
+                  start_time:
+                    type: string
+                    format: date-time
+                  covers:
+                    type: integer
+                  notes:
+                    type: string
+                    nullable: true
+                  restaurant_id:
+                    type: integer
+                  guest_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  qr_code_image:
+                    type: string
+                    nullable: true
+                  hash_id:
+                    type: string
+                    nullable: true
+                  table:
+                    type: string
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  confirmation_request:
+                    type: boolean
+                  confirmation_request_date:
+                    type: string
+                    format: date-time
+                    nullable: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reservation:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                      example: 1
+                      description: 0=requested, 1=pending, 2=booked, 3=ended, 4=cancelled,
+                        5=noshow
+                    start_time:
+                      type: string
+                      example: '2025-04-15T19:30:00Z'
+                      description: ISO 8601 format or UNIX timestamp
+                    covers:
+                      type: integer
+                      example: 2
+                    notes:
+                      type: string
+                      example: Window seat preferred
+                      nullable: true
+                    qr_code_image:
+                      type: string
+                      nullable: true
+                    table:
+                      type: string
+                      example: Table 7
+                      nullable: true
+                    metadata:
+                      type: object
+                      example:
+                        special_occasion: Birthday
+                        food_preferences: Vegetarian
+                      nullable: true
+                    confirmation_request:
+                      type: boolean
+                      example: false
+                    confirmation_request_date:
+                      type: string
+                      format: date-time
+                      nullable: true
+                  required:
+                  - status
+                  - start_time
+                  - covers
+              required:
+              - reservation
+  "/v1/restaurants/{restaurant_id}/guests/{guest_id}/reservations/{id}":
+    parameters:
+    - name: restaurant_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: guest_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieve a reservation
+      tags:
+      - Reservations
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: reservation found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  status:
+                    type: integer
+                  start_time:
+                    type: string
+                    format: date-time
+                  covers:
+                    type: integer
+                  notes:
+                    type: string
+                    nullable: true
+                  restaurant_id:
+                    type: integer
+                  guest_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  qr_code_image:
+                    type: string
+                    nullable: true
+                  hash_id:
+                    type: string
+                    nullable: true
+                  table:
+                    type: string
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  confirmation_request:
+                    type: boolean
+                  confirmation_request_date:
+                    type: string
+                    format: date-time
+                    nullable: true
+    put:
+      summary: Update a reservation
+      tags:
+      - Reservations
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: reservation updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  status:
+                    type: integer
+                  start_time:
+                    type: string
+                    format: date-time
+                  covers:
+                    type: integer
+                  notes:
+                    type: string
+                    nullable: true
+                  restaurant_id:
+                    type: integer
+                  guest_id:
+                    type: integer
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+                  qr_code_image:
+                    type: string
+                    nullable: true
+                  hash_id:
+                    type: string
+                    nullable: true
+                  table:
+                    type: string
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  confirmation_request:
+                    type: boolean
+                  confirmation_request_date:
+                    type: string
+                    format: date-time
+                    nullable: true
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                reservation:
+                  type: object
+                  properties:
+                    status:
+                      type: integer
+                    start_time:
+                      type: string
+                    covers:
+                      type: integer
+                    notes:
+                      type: string
+                      nullable: true
+                    table:
+                      type: string
+                      nullable: true
+                    metadata:
+                      type: object
+                      nullable: true
+                    confirmation_request:
+                      type: boolean
+    delete:
+      summary: Delete a reservation
+      tags:
+      - Reservations
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: reservation deleted
+  "/v1/restaurants/{restaurant_id}/guests/{guest_id}/reservations/{id}/request_confirmation":
+    parameters:
+    - name: restaurant_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: guest_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    post:
+      summary: Request confirmation for a guest reservation
+      tags:
+      - Reservations
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: confirmation request sent successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      status:
+                        type: integer
+                      start_time:
+                        type: string
+                        format: date-time
+                      covers:
+                        type: integer
+                      notes:
+                        type: string
+                        nullable: true
+                      restaurant_id:
+                        type: integer
+                      guest_id:
+                        type: integer
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                      qr_code_image:
+                        type: string
+                        nullable: true
+                      hash_id:
+                        type: string
+                        nullable: true
+                      table:
+                        type: string
+                        nullable: true
+                      metadata:
+                        type: object
+                        nullable: true
+                      confirmation_request:
+                        type: boolean
+                      confirmation_request_date:
+                        type: string
+                        format: date-time
+                        nullable: true
+                  message:
+                    type: string
+  "/v1/restaurants/{restaurant_id}/reservations/by_hash/{hash_id}":
+    parameters:
+    - name: restaurant_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: hash_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Retrieve a reservation by hash ID at restaurant level
+      tags:
+      - Reservations
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: reservation found by hash
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      status:
+                        type: integer
+                      start_time:
+                        type: string
+                        format: date-time
+                      covers:
+                        type: integer
+                      notes:
+                        type: string
+                        nullable: true
+                      restaurant_id:
+                        type: integer
+                      guest_id:
+                        type: integer
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                      qr_code_image:
+                        type: string
+                        nullable: true
+                      hash_id:
+                        type: string
+                      table:
+                        type: string
+                        nullable: true
+                      metadata:
+                        type: object
+                        nullable: true
+                      confirmation_request:
+                        type: boolean
+                      confirmation_request_date:
+                        type: string
+                        format: date-time
+                        nullable: true
+                  guest:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      phone:
+                        type: string
+                      email:
+                        type: string
+                      restaurant_id:
+                        type: integer
+                      notes:
+                        type: string
+                        nullable: true
+                      allergies:
+                        type: string
+                        nullable: true
+                  recent_reservations_count:
+                    type: integer
+        '404':
+          description: reservation not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  "/v1/restaurants/{restaurant_id}/guests/{guest_id}/reservations/by_hash/{hash_id}":
+    parameters:
+    - name: restaurant_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: guest_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: hash_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Retrieve a reservation by hash ID for a specific guest
+      tags:
+      - Reservations
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: reservation found by hash
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      status:
+                        type: integer
+                      start_time:
+                        type: string
+                        format: date-time
+                      covers:
+                        type: integer
+                      notes:
+                        type: string
+                        nullable: true
+                      restaurant_id:
+                        type: integer
+                      guest_id:
+                        type: integer
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                      qr_code_image:
+                        type: string
+                        nullable: true
+                      hash_id:
+                        type: string
+                      table:
+                        type: string
+                        nullable: true
+                      metadata:
+                        type: object
+                        nullable: true
+                      confirmation_request:
+                        type: boolean
+                      confirmation_request_date:
+                        type: string
+                        format: date-time
+                        nullable: true
+                  guest:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      phone:
+                        type: string
+                      email:
+                        type: string
+                      restaurant_id:
+                        type: integer
+                      notes:
+                        type: string
+                        nullable: true
+                      allergies:
+                        type: string
+                        nullable: true
+                  recent_reservations_count:
+                    type: integer
+        '404':
+          description: reservation not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  "/v1/public/restaurants/{restaurant_id}/reservations/by_hash/{hash_id}":
+    parameters:
+    - name: restaurant_id
+      in: path
+      required: true
+      schema:
+        type: integer
+    - name: hash_id
+      in: path
+      required: true
+      schema:
+        type: string
+    get:
+      summary: Public endpoint to retrieve a reservation by hash ID (no authentication
+        required)
+      tags:
+      - Public Reservations
+      responses:
+        '200':
+          description: reservation found by hash (public)
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  reservation:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      status:
+                        type: integer
+                      start_time:
+                        type: string
+                        format: date-time
+                      covers:
+                        type: integer
+                      notes:
+                        type: string
+                        nullable: true
+                      restaurant_id:
+                        type: integer
+                      guest_id:
+                        type: integer
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                      qr_code_image:
+                        type: string
+                        nullable: true
+                      hash_id:
+                        type: string
+                      table:
+                        type: string
+                        nullable: true
+                      metadata:
+                        type: object
+                        nullable: true
+                      confirmation_request:
+                        type: boolean
+                      confirmation_request_date:
+                        type: string
+                        format: date-time
+                        nullable: true
+                  guest:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      first_name:
+                        type: string
+                      last_name:
+                        type: string
+                      phone:
+                        type: string
+                      email:
+                        type: string
+                      restaurant_id:
+                        type: integer
+                  recent_reservations_count:
+                    type: integer
+        '404':
+          description: reservation not found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+  "/v1/reservations/pending_confirmations":
+    get:
+      summary: List reservations ready for confirmation
+      tags:
+      - Reservations
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: pending confirmation messages retrieved
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    restaurant_id:
+                      type: integer
+                    name:
+                      type: string
+                    tenant_id:
+                      type: string
+                      nullable: true
+                    confirmation_header_text:
+                      type: string
+                    confirmation_body_text:
+                      type: string
+                    confirm_message_to:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          guest_id:
+                            type: integer
+                          full_name:
+                            type: string
+                          phone:
+                            type: string
+                          email:
+                            type: string
+                          reservation_id:
+                            type: integer
+                          start_time:
+                            type: string
+                            format: date-time
+                          covers:
+                            type: integer
+                          notes:
+                            type: string
+                            nullable: true
+                          table:
+                            type: string
+                            nullable: true
+                          metadata:
+                            type: object
+                            nullable: true
+  "/v1/restaurants":
+    get:
+      summary: List all restaurants
+      tags:
+      - Restaurants
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: restaurants found
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    restaurant:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        name:
+                          type: string
+                        cuisines:
+                          type: string
+                        phone:
+                          type: string
+                        email:
+                          type: string
+                        location:
+                          type: string
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+                        send_confirmation:
+                          type: boolean
+                        send_confirmation_before:
+                          type: integer
+                        confirmation_header_text:
+                          type: string
+                        confirmation_body_text:
+                          type: string
+                    opening_times:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          id:
+                            type: integer
+                          day_of_week:
+                            type: integer
+                          opening_time:
+                            type: string
+                          closing_time:
+                            type: string
+                          restaurant_id:
+                            type: integer
+                          created_at:
+                            type: string
+                            format: date-time
+                          updated_at:
+                            type: string
+                            format: date-time
+        '401':
+          description: unauthorized
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  message:
+                    type: string
+                  status:
+                    type: integer
+    post:
+      summary: Create a restaurant
+      tags:
+      - Restaurants
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: restaurant created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restaurant:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      cuisines:
+                        type: string
+                      phone:
+                        type: string
+                      email:
+                        type: string
+                      location:
+                        type: string
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                      send_confirmation:
+                        type: boolean
+                      send_confirmation_before:
+                        type: integer
+                      confirmation_header_text:
+                        type: string
+                      confirmation_body_text:
+                        type: string
+                  opening_times:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        day_of_week:
+                          type: integer
+                        opening_time:
+                          type: string
+                        closing_time:
+                          type: string
+                        restaurant_id:
+                          type: integer
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                restaurant:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: New Restaurant
+                    cuisines:
+                      type: string
+                      example: italian, chinese
+                    phone:
+                      type: string
+                      example: 555-123-4567
+                    email:
+                      type: string
+                      example: info@restaurant.com
+                    location:
+                      type: string
+                      example: 123 Main St, City
+                    send_confirmation:
+                      type: boolean
+                      example: false
+                    send_confirmation_before:
+                      type: integer
+                      example: 24
+                    confirmation_header_text:
+                      type: string
+                      example: Please confirm your reservation
+                    confirmation_body_text:
+                      type: string
+                      example: We're looking forward to seeing you. Please confirm
+                        your reservation by replying YES.
+                    opening_times_attributes:
+                      type: array
+                      example:
+                      - day_of_week: 1
+                        opening_time: '09:00'
+                        closing_time: '22:00'
+                      items:
+                        type: object
+                        properties:
+                          day_of_week:
+                            type: integer
+                          opening_time:
+                            type: string
+                          closing_time:
+                            type: string
+                  required:
+                  - name
+                  - cuisines
+                  - phone
+                  - email
+                  - location
+              required:
+              - restaurant
+  "/v1/restaurants/{id}":
+    parameters:
+    - name: id
+      in: path
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieve a restaurant
+      tags:
+      - Restaurants
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: restaurant found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restaurant:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      cuisines:
+                        type: string
+                      phone:
+                        type: string
+                      email:
+                        type: string
+                      location:
+                        type: string
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                      send_confirmation:
+                        type: boolean
+                      send_confirmation_before:
+                        type: integer
+                      confirmation_header_text:
+                        type: string
+                      confirmation_body_text:
+                        type: string
+                  opening_times:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        day_of_week:
+                          type: integer
+                        opening_time:
+                          type: string
+                        closing_time:
+                          type: string
+                        restaurant_id:
+                          type: integer
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+        '404':
+          description: restaurant not found
+    put:
+      summary: Update a restaurant
+      tags:
+      - Restaurants
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: restaurant updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  restaurant:
+                    type: object
+                    properties:
+                      id:
+                        type: integer
+                      name:
+                        type: string
+                      cuisines:
+                        type: string
+                      phone:
+                        type: string
+                      email:
+                        type: string
+                      location:
+                        type: string
+                      created_at:
+                        type: string
+                        format: date-time
+                      updated_at:
+                        type: string
+                        format: date-time
+                      send_confirmation:
+                        type: boolean
+                      send_confirmation_before:
+                        type: integer
+                      confirmation_header_text:
+                        type: string
+                      confirmation_body_text:
+                        type: string
+                  opening_times:
+                    type: array
+                    items:
+                      type: object
+                      properties:
+                        id:
+                          type: integer
+                        day_of_week:
+                          type: integer
+                        opening_time:
+                          type: string
+                        closing_time:
+                          type: string
+                        restaurant_id:
+                          type: integer
+                        created_at:
+                          type: string
+                          format: date-time
+                        updated_at:
+                          type: string
+                          format: date-time
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                restaurant:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    cuisines:
+                      type: string
+                    phone:
+                      type: string
+                    email:
+                      type: string
+                    location:
+                      type: string
+                    send_confirmation:
+                      type: boolean
+                    send_confirmation_before:
+                      type: integer
+                    confirmation_header_text:
+                      type: string
+                    confirmation_body_text:
+                      type: string
+                    opening_times_attributes:
+                      type: array
+                      items:
+                        type: object
+                        properties:
+                          day_of_week:
+                            type: integer
+                          opening_time:
+                            type: string
+                          closing_time:
+                            type: string
+    delete:
+      summary: Delete a restaurant
+      tags:
+      - Restaurants
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: restaurant deleted
+  "/users/sign_in":
+    post:
+      summary: User sign in
+      tags:
+      - 1-Authentication
+      parameters: []
+      responses:
+        '200':
+          description: user signed in successfully
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  email:
+                    type: string
+                  authentication_token:
+                    type: string
+                  role:
+                    type: integer
+                    description: 0=admin, 1=restaurant, 2=guest
+                  restaurant_id:
+                    type: integer
+                    nullable: true
+                    description: ID of the restaurant this user belongs to
+                  active:
+                    type: boolean
+                  name:
+                    type: string
+                    nullable: true
+                  job:
+                    type: string
+                    nullable: true
+        '401':
+          description: invalid credentials
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  error:
+                    type: string
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                user:
+                  type: object
+                  properties:
+                    email:
+                      type: string
+                      example: user@example.com
+                    password:
+                      type: string
+                      example: password
+                  required:
+                  - email
+                  - password
+              required:
+              - user
+  "/users/sign_out":
+    delete:
+      summary: User sign out
+      tags:
+      - 1-Authentication
+      description: Sign out a user by invalidating their session. Requires authentication
+        headers.
+      security:
+      - ApiKeyAuth: []
+      parameters:
+      - name: X-User-Email
+        in: header
+        required: true
+        description: Email address of the user signing out
+        schema:
+          type: string
+      - name: X-User-Token
+        in: header
+        required: true
+        description: Authentication token received when signing in
+        schema:
+          type: string
+      responses:
+        '200':
+          description: signed out successfully
+        '401':
+          description: not authenticated
+  "/v1/restaurants/{restaurant_id}/sections":
+    parameters:
+    - name: restaurant_id
+      in: path
+      description: ID of the restaurant
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: List sections for a restaurant
+      tags:
+      - Sections
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: list of sections
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    restaurant_id:
+                      type: integer
+                    name:
+                      type: string
+                    description:
+                      type: string
+                      nullable: true
+                    capacity:
+                      type: integer
+                      nullable: true
+                    metadata:
+                      type: object
+                      nullable: true
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                  required:
+                  - id
+                  - restaurant_id
+                  - name
+                  - created_at
+                  - updated_at
+    post:
+      summary: Create a section
+      tags:
+      - Sections
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: section created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  restaurant_id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  capacity:
+                    type: integer
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                section:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Main Dining Room
+                    description:
+                      type: string
+                      example: Primary seating area
+                      nullable: true
+                    capacity:
+                      type: integer
+                      example: 50
+                      nullable: true
+                    metadata:
+                      type: object
+                      example:
+                        floor: 1
+                        ambiance: casual
+                      nullable: true
+                  required:
+                  - name
+              required:
+              - section
+  "/v1/restaurants/{restaurant_id}/sections/{id}":
+    parameters:
+    - name: restaurant_id
+      in: path
+      description: ID of the restaurant
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      description: ID of the section
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieve a section
+      tags:
+      - Sections
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: section found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  restaurant_id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  capacity:
+                    type: integer
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: section not found
+    put:
+      summary: Update a section
+      tags:
+      - Sections
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: section updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  restaurant_id:
+                    type: integer
+                  name:
+                    type: string
+                  description:
+                    type: string
+                    nullable: true
+                  capacity:
+                    type: integer
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                section:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    description:
+                      type: string
+                      nullable: true
+                    capacity:
+                      type: integer
+                      nullable: true
+                    metadata:
+                      type: object
+                      nullable: true
+    delete:
+      summary: Delete a section
+      tags:
+      - Sections
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '204':
+          description: section deleted
+        '404':
+          description: section not found
+  "/v1/restaurants/{restaurant_id}/tables":
+    parameters:
+    - name: restaurant_id
+      in: path
+      description: ID of the restaurant
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: List tables for a restaurant
+      tags:
+      - Tables
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: list of tables
+          content:
+            application/json:
+              schema:
+                type: array
+                items:
+                  type: object
+                  properties:
+                    id:
+                      type: integer
+                    restaurant_id:
+                      type: integer
+                    name:
+                      type: string
+                    section:
+                      type: string
+                      nullable: true
+                    capacity:
+                      type: integer
+                    position_x:
+                      type: integer
+                      nullable: true
+                    position_y:
+                      type: integer
+                      nullable: true
+                    metadata:
+                      type: object
+                      nullable: true
+                    created_at:
+                      type: string
+                      format: date-time
+                    updated_at:
+                      type: string
+                      format: date-time
+                  required:
+                  - id
+                  - restaurant_id
+                  - name
+                  - capacity
+                  - created_at
+                  - updated_at
+    post:
+      summary: Create a table
+      tags:
+      - Tables
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '201':
+          description: table created
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  restaurant_id:
+                    type: integer
+                  name:
+                    type: string
+                  section:
+                    type: string
+                    nullable: true
+                  capacity:
+                    type: integer
+                  position_x:
+                    type: integer
+                    nullable: true
+                  position_y:
+                    type: integer
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                table:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                      example: Table 10
+                    section:
+                      type: string
+                      example: Main Dining Room
+                      nullable: true
+                    capacity:
+                      type: integer
+                      example: 4
+                    position_x:
+                      type: integer
+                      example: 100
+                      nullable: true
+                    position_y:
+                      type: integer
+                      example: 250
+                      nullable: true
+                    metadata:
+                      type: object
+                      example:
+                        style: booth
+                        view: window
+                      nullable: true
+                  required:
+                  - name
+                  - capacity
+              required:
+              - table
+  "/v1/restaurants/{restaurant_id}/tables/{id}":
+    parameters:
+    - name: restaurant_id
+      in: path
+      description: ID of the restaurant
+      required: true
+      schema:
+        type: integer
+    - name: id
+      in: path
+      description: ID of the table
+      required: true
+      schema:
+        type: integer
+    get:
+      summary: Retrieve a table
+      tags:
+      - Tables
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '200':
+          description: table found
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  restaurant_id:
+                    type: integer
+                  name:
+                    type: string
+                  section:
+                    type: string
+                    nullable: true
+                  capacity:
+                    type: integer
+                  position_x:
+                    type: integer
+                    nullable: true
+                  position_y:
+                    type: integer
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '404':
+          description: table not found
+    put:
+      summary: Update a table
+      tags:
+      - Tables
+      security:
+      - ApiKeyAuth: []
+      parameters: []
+      responses:
+        '200':
+          description: table updated
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  id:
+                    type: integer
+                  restaurant_id:
+                    type: integer
+                  name:
+                    type: string
+                  section:
+                    type: string
+                    nullable: true
+                  capacity:
+                    type: integer
+                  position_x:
+                    type: integer
+                    nullable: true
+                  position_y:
+                    type: integer
+                    nullable: true
+                  metadata:
+                    type: object
+                    nullable: true
+                  created_at:
+                    type: string
+                    format: date-time
+                  updated_at:
+                    type: string
+                    format: date-time
+        '422':
+          description: invalid request
+      requestBody:
+        content:
+          application/json:
+            schema:
+              type: object
+              properties:
+                table:
+                  type: object
+                  properties:
+                    name:
+                      type: string
+                    section:
+                      type: string
+                      nullable: true
+                    capacity:
+                      type: integer
+                    position_x:
+                      type: integer
+                      nullable: true
+                    position_y:
+                      type: integer
+                      nullable: true
+                    metadata:
+                      type: object
+                      nullable: true
+    delete:
+      summary: Delete a table
+      tags:
+      - Tables
+      security:
+      - ApiKeyAuth: []
+      responses:
+        '204':
+          description: table deleted
+        '404':
+          description: table not found
+servers:
+- url: http://localhost:3101
+  description: Development server
+- url: https://{hostname}
+  variables:
+    hostname:
+      default: api.example.com
+      description: API hostname
+components:
+  securitySchemes:
+    ApiKeyAuth:
+      type: apiKey
+      name: X-User-Token
+      in: header
+      description: X-User-Token must be provided along with X-User-Email header
+    EmailAuth:
+      type: apiKey
+      name: X-User-Email
+      in: header
+      description: X-User-Email must be provided along with X-User-Token header

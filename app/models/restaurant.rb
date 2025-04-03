@@ -4,6 +4,7 @@ class Restaurant < ApplicationRecord
   has_many :guests, dependent: :destroy
   has_many :reservations, dependent: :destroy
   has_many :opening_times, dependent: :destroy
+  has_many :users
 
   accepts_nested_attributes_for :opening_times
 

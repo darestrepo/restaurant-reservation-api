@@ -22,6 +22,11 @@ gem 'cancancan'
 gem 'aws-sdk-s3', '~> 1.140'
 # HTTP requests
 gem 'httparty', '~> 0.21.0'
+# API Documentation
+gem 'rswag-api'
+gem 'rswag-ui'
+# CORS support
+gem 'rack-cors'
 # Build JSON APIs with ease. Read more: https://github.com/rails/jbuilder
 # gem 'jbuilder', '~> 2.5'
 # Use Redis adapter to run Action Cable in production
@@ -51,6 +56,8 @@ group :development, :test do
   gem 'rspec-core'
   gem 'rspec-rails'
   gem 'dotenv-rails'
+  # API Documentation spec helper
+  gem 'rswag-specs'
 end
 
 group :development do

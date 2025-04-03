@@ -38,6 +38,13 @@ describe Reservation do
     end
   end
   
+  context 'when status is noshow' do
+    it 'returns true when noshow? is called' do
+      reservation = build(:reservation, :noshow)
+      expect(reservation.noshow?).to eq(true)
+    end
+  end
+  
   context 'when creating a reservation' do
     it 'generates a hash_id in the correct format' do
       reservation_date = DateTime.new(2025, 4, 15, 18, 30)
@@ -73,6 +80,34 @@ describe Reservation do
         
         expect(reservation.qr_code_image).to eq('https://s3-bucket.example.com/qr_image.svg')
       end
+    end
+  end
+  
+  context 'when updating confirmation_request' do
+    it 'sets confirmation_request_date when confirmation_request is set to true' do
+      reservation = create(:reservation, confirmation_request: false)
+      expect(reservation.confirmation_request_date).to be_nil
+      
+      freeze_time = Time.current
+      allow(Time).to receive(:current).and_return(freeze_time)
+      
+      reservation.update(confirmation_request: true)
+      expect(reservation.confirmation_request_date).to eq(freeze_time)
+    end
+    
+    it 'does not update confirmation_request_date when confirmation_request is already true' do
+      freeze_time = Time.current
+      allow(Time).to receive(:current).and_return(freeze_time)
+      
+      reservation = create(:reservation, confirmation_request: true)
+      expect(reservation.confirmation_request_date).to eq(freeze_time)
+      
+      # Advance time
+      new_time = freeze_time + 1.day
+      allow(Time).to receive(:current).and_return(new_time)
+      
+      reservation.update(notes: "Updated notes")
+      expect(reservation.confirmation_request_date).to eq(freeze_time)
     end
   end
 end

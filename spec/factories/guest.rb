@@ -6,5 +6,12 @@ FactoryBot.define do
     last_name { Faker::Name.last_name }
     phone { Faker::PhoneNumber.phone_number }
     email { Faker::Internet.email }
+    full_name { nil }
+    
+    trait :with_full_name_only do
+      first_name { nil }
+      last_name { nil }
+      full_name { Faker::Name.name }
+    end
   end
 end

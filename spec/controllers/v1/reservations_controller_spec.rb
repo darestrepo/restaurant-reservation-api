@@ -82,4 +82,42 @@ describe V1::ReservationsController do
     expect(json['guest']['id']).to eq(guest.id)
     expect(json['recent_reservations_count']).to be_a(Integer)
   end
+
+  describe 'POST #request_confirmation' do
+    context 'when user is authorized' do
+      let(:reservation) { create(:reservation, restaurant: restaurant, guest: guest, confirmation_request: false) }
+      
+      before do
+        sign_in user
+      end
+      
+      it 'sets confirmation_request to true' do
+        post :request_confirmation, params: { restaurant_id: restaurant.id, id: reservation.id }
+        
+        expect(response).to have_http_status(:ok)
+        expect(JSON.parse(response.body)['reservation']['confirmation_request']).to eq(true)
+        expect(JSON.parse(response.body)['message']).to eq('Confirmation request sent successfully')
+        
+        # Reload the reservation to verify the database was updated
+        reservation.reload
+        expect(reservation.confirmation_request).to eq(true)
+        expect(reservation.confirmation_request_date).not_to be_nil
+      end
+    end
+    
+    context 'when user is not authorized' do
+      let(:reservation) { create(:reservation, restaurant: restaurant, guest: guest) }
+      let(:another_user) { create(:user) }
+      
+      before do
+        sign_in another_user
+      end
+      
+      it 'returns unauthorized' do
+        post :request_confirmation, params: { restaurant_id: restaurant.id, id: reservation.id }
+        
+        expect(response).to have_http_status(:unauthorized)
+      end
+    end
+  end
 end

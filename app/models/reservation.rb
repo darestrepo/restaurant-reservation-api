@@ -6,12 +6,24 @@ class Reservation < ApplicationRecord
 
   validates :status, :start_time, :covers, presence: true
 
-  enum status: %i[requested pending booked ended cancelled]
+  enum status: %i[requested pending booked ended cancelled noshow]
   
   before_create :generate_hash_id
   before_create :generate_qr_code
+  before_save :update_confirmation_request_date
+  
+  # Override as_json to ensure boolean fields are properly serialized
+  def as_json(options = {})
+    json = super(options)
+    json["confirmation_request"] = self.confirmation_request? ? true : false
+    json
+  end
   
   private
+  
+  def update_confirmation_request_date
+    self.confirmation_request_date = Time.current if confirmation_request && confirmation_request_changed?
+  end
   
   def generate_hash_id
     # Format: DDMMYY_XXXXX where XXXXX is a 5-character alpha random hash
